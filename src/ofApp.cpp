@@ -9,8 +9,7 @@ void ofApp::setup(){
     ofDisableArbTex();
     
     //light.enable();
-    material.setAmbientColor(ofColor::white);
-    material.setShininess(1.0f);
+    
 
     bDrawModel = false;
     bHideGui = false;
@@ -28,12 +27,15 @@ void ofApp::setup(){
     gui.add(speed.setup("Rotate Speed", 0.5f, 0.0f, 10.0f));
     gui.add(rotation.setup("Rotation", ofVec3f(0.5f, 0.5f, 0.5f),ofVec3f(0.0f,0.0f,0.0f), ofVec3f(5.0f,5.0f,5.0f)));
     gui.add(scaling.setup("Scaling",ofVec3f(0.5f, 0.5f, 0.5f),ofVec3f(0.0f,0.0f,0.0f), ofVec3f(5.0f,5.0f,5.0f)));
+    gui.add(color.setup("Color", ofColor(255,255,255), ofColor(0, 0), ofColor(255, 255)));
 
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     
+//    material.setAmbientColor(color);
+//    material.setShininess(1.0f);
 }
 
 //--------------------------------------------------------------
@@ -99,7 +101,7 @@ void ofApp::drawModel(){
 
     for(unsigned int i = 0; i < verts.size(); i++){
 
-        ofFloatColor c = ofColor::white;
+        ofFloatColor c = color;
         c.a = i * alpha;
         mesh.addColor(c);
 

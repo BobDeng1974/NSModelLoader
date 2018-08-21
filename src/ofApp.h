@@ -39,7 +39,7 @@ public:
     ofxPanel gui;
     ofxFloatSlider speed, amp, ampTotal, liquid, dampen, alpha;
     ofxVec3Slider rotation, scaling;
-
+    ofxFloatColorSlider color;
     ofxToggle bMeshModeToggle, bMeshTypeToggle;
     
     
