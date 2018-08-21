@@ -8,11 +8,10 @@ void ofApp::setup(){
     ofBackground(ofColor::black);
     ofDisableArbTex();
     
-    //light.enable();
-    
 
     bDrawModel = false;
     bHideGui = false;
+    bLighting = false;
 
     gui.setup();
     gui.add(bMeshModeToggle.setup("Mesh Mode", false));
@@ -34,8 +33,9 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
     
-//    material.setAmbientColor(color);
-//    material.setShininess(1.0f);
+    material.setAmbientColor(color);
+    material.setShininess(1.0f);
+    
 }
 
 //--------------------------------------------------------------
@@ -43,10 +43,11 @@ void ofApp::draw(){
     
     if(!bHideGui) {
         gui.draw();
+        ofDrawBitmapString("FPS: " + ofToString(ofGetFrameRate()), 10,10);
+        
     }
 
-    ofDrawBitmapString("FPS: " + ofToString(ofGetFrameRate()), 50,50);
-    
+   
     if(bDrawModel) {
         ofSetColor(255, 255, 255, 255);
         drawModel();
@@ -139,6 +140,15 @@ void ofApp::keyPressed(int key){
     
     if(key == 'h'){
         bHideGui = !bHideGui;
+    }
+    
+    if(key == 'l'){
+        bLighting = !bLighting;
+        if(bLighting) {
+            light.enable();
+        } else {
+            light.disable();
+        }
     }
 }
 

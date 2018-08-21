@@ -31,7 +31,7 @@ public:
     ofImage img;
     ofxAssimpModelLoader draggedModel;
     
-    bool bDrawModel, bHideGui;
+    bool bDrawModel, bHideGui, bLighting;
     float x,y;
     float easing;
     
