@@ -1,0 +1,19 @@
+<group>
+    <fill>1</fill>
+    <radius>140</radius>
+    <center>512, 384</center>
+    <color>100, 100, 140, 255</color>
+    <circle_res>5</circle_res>
+    <screen_size>1024x768</screen_size>
+<group/>
+	<Mesh_Mode>1</Mesh_Mode>
+	<Mesh_Type>0</Mesh_Type>
+	<Amplitude>77.5</Amplitude>
+	<Amplitude_Total>387.5</Amplitude_Total>
+	<Liquid>57.5</Liquid>
+	<Dampening>0.56</Dampening>
+	<Alpha>0.0002</Alpha>
+	<Rotate_Speed>0.45</Rotate_Speed>
+	<Rotation>0.969388, 0.765306, 2.70408</Rotation>
+	<Scaling>0.714286, 0.612245, 0.867347</Scaling>
+</group>
