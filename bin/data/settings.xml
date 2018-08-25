@@ -6,14 +6,17 @@
     <circle_res>5</circle_res>
     <screen_size>1024x768</screen_size>
 <group/>
-	<Mesh_Mode>1</Mesh_Mode>
-	<Mesh_Type>0</Mesh_Type>
-	<Amplitude>77.5</Amplitude>
-	<Amplitude_Total>387.5</Amplitude_Total>
-	<Liquid>57.5</Liquid>
-	<Dampening>0.56</Dampening>
-	<Alpha>0.0002</Alpha>
-	<Rotate_Speed>0.45</Rotate_Speed>
-	<Rotation>0.969388, 0.765306, 2.70408</Rotation>
-	<Scaling>0.714286, 0.612245, 0.867347</Scaling>
+	<Mesh_Mode>0</Mesh_Mode>
+	<Mesh_Type>1</Mesh_Type>
+	<Amplitude>-3.2</Amplitude>
+	<Amplitude_Total>-2</Amplitude_Total>
+	<Liquid>-5</Liquid>
+	<Dampening>5</Dampening>
+	<Alpha>0.000105</Alpha>
+	<Rotate_Speed>10</Rotate_Speed>
+	<Rotation>3.69898, 3.2398, 3.92857</Rotation>
+	<Scaling>0.459184, 0.459184, 0.408163</Scaling>
+<Mesh_Secondary>1</Mesh_Secondary>
+	<Color>1, 1, 1, 1</Color>
+	<Color_Mesh_Secondary>1, 1, 1, 1</Color_Mesh_Secondary>
 </group>

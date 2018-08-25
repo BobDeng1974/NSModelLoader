@@ -24,6 +24,7 @@ public:
     void gotMessage(ofMessage msg);
     
     void drawModel();
+    void setVerts(vector<ofVec3f>& v, ofVboMesh m);
     
     ofLight light;
     ofMaterial material;
@@ -32,15 +33,13 @@ public:
     ofxAssimpModelLoader draggedModel;
     
     bool bDrawModel, bHideGui, bLighting;
-    float x,y;
-    float easing;
     
     //GUI//
     ofxPanel gui;
     ofxFloatSlider speed, amp, ampTotal, liquid, dampen, alpha;
     ofxVec3Slider rotation, scaling;
-    ofxFloatColorSlider color;
-    ofxToggle bMeshModeToggle, bMeshTypeToggle;
+    ofxFloatColorSlider color, colorSecondary;
+    ofxToggle bMeshModeToggle, bMeshTypeToggle, bShowSecondaryMesh;
     
     
 };

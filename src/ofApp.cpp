@@ -16,18 +16,48 @@ void ofApp::setup(){
     gui.setup();
     gui.add(bMeshModeToggle.setup("Mesh Mode", false));
     gui.add(bMeshTypeToggle.setup("Mesh Type", false));
+    gui.add(bShowSecondaryMesh.setup("Mesh Secondary", false));
 
-    gui.add(amp.setup("Amplitude", 0.5f, 0.0f, 500.0f));
-    gui.add(ampTotal.setup("Amplitude Total", 0.5f, 0.0f, 500.0f));
-    gui.add(liquid.setup("Liquid", 0.5f, 0.0f, 500.0f));
-    gui.add(dampen.setup("Dampening", 0.5f, 0.0f, 2.0f));
-    gui.add(alpha.setup("Alpha", 0.1f, 0.0f, 0.02f));
+    gui.add(amp.setup("Amplitude", 0.5f, -5.0f, 10.0f));
+    gui.add(ampTotal.setup("Amplitude Total", 0.5f, -5.0f, 10.0f));
+    gui.add(liquid.setup("Liquid", 0.5f, -5.0f, 500.0f));
+    gui.add(dampen.setup("Dampening", 0.5f, 0.0f, 5.0f));
+    gui.add(alpha.setup("Alpha", 0.1f, 0.0f, 0.007f));
     
     gui.add(speed.setup("Rotate Speed", 0.5f, 0.0f, 10.0f));
     gui.add(rotation.setup("Rotation", ofVec3f(0.5f, 0.5f, 0.5f),ofVec3f(0.0f,0.0f,0.0f), ofVec3f(5.0f,5.0f,5.0f)));
     gui.add(scaling.setup("Scaling",ofVec3f(0.5f, 0.5f, 0.5f),ofVec3f(0.0f,0.0f,0.0f), ofVec3f(5.0f,5.0f,5.0f)));
     gui.add(color.setup("Color", ofColor(255,255,255), ofColor(0, 0), ofColor(255, 255)));
+    gui.add(colorSecondary.setup("Color Mesh Secondary", ofColor(255,0,0), ofColor(0, 0), ofColor(255, 255)));
+    //colorSecondary.minimize();
+}
 
+
+//--------------------------------------------------------------
+void ofApp::dragEvent(ofDragInfo dragInfo){
+    
+    
+    int total = dragInfo.files.size();
+    for (int i = 0; i < total; i++) {
+        string filePath = dragInfo.files.at(0);
+        bool bModelLoaded = ofIsStringInString(filePath, "models");
+        bool bTextureLoaded = ofIsStringInString(filePath,"textures");
+        
+        if (bModelLoaded) {
+            draggedModel.loadModel(filePath);
+            draggedModel.setPosition(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 0.0f);
+            //light.setPosition(draggedModel.getPosition() + ofPoint(0, 0, 1600));
+            bDrawModel = true;
+        } else if (bTextureLoaded) {
+            img.load(filePath);
+            tex = img.getTexture();
+        }
+        std::cout << "Total Files: " << total << std::endl;
+        std::cout << "File Path: " << filePath << std::endl;
+        
+        
+    }
+    
 }
 
 //--------------------------------------------------------------
@@ -44,35 +74,39 @@ void ofApp::draw(){
     if(!bHideGui) {
         gui.draw();
         ofDrawBitmapString("FPS: " + ofToString(ofGetFrameRate()), 10,10);
-        
     }
 
-   
     if(bDrawModel) {
-        ofSetColor(255, 255, 255, 255);
         drawModel();
     }
 
 
 }
 
-void ofApp::drawModel(){
+void ofApp::setVerts(vector<ofVec3f> &v, ofVboMesh m){
+    
+    float l = liquid;
+    float amplitude = amp / ampTotal;
+    float speedDampen = dampen;
+    
+    for(unsigned int i = 0; i < v.size(); i++){
+        
+        v[i].x += ofSignedNoise(v[i].x/l, v[i].y/l,v[i].z/l, ofGetElapsedTimef()/speedDampen)*amplitude;
+        v[i].y += ofSignedNoise(v[i].z/l, v[i].x/l,v[i].y/l, ofGetElapsedTimef()/speedDampen)*amplitude;
+        v[i].z += ofSignedNoise(v[i].y/l, v[i].z/l,v[i].x/l, ofGetElapsedTimef()/speedDampen)*amplitude;
+        
+    }
+}
 
+void ofApp::drawModel(){
 
     ofVec3f scale = draggedModel.getScale();
     ofVec3f position = draggedModel.getPosition();
     float normalizedScale = draggedModel.getNormalizedScale();
     ofVboMesh mesh = draggedModel.getMesh(0);
+    ofVboMesh meshSecondary = draggedModel.getMesh(0);
     ofTexture texture;
     ofxAssimpMeshHelper& meshHelper = draggedModel.getMeshHelper( 0 );
-
-    if (bMeshModeToggle) {
-        if(bMeshTypeToggle) {
-            mesh.setMode(OF_PRIMITIVE_POINTS);
-        }else{
-            mesh.setMode(OF_PRIMITIVE_LINE_LOOP);
-        }
-    }
 
     ofTranslate(position);
     
@@ -80,52 +114,67 @@ void ofApp::drawModel(){
     float timeX = t * rotation->x;
     float timeY = t * rotation->y;
     float timeZ = t * rotation->z;
-//    ofRotate(time, 1, 1, 0);
-//    ofRotate(90,0,0,1);
+
     ofRotateX(timeX);
     ofRotateY(timeY);
     ofRotateZ(timeZ);
     ofScale(normalizedScale, normalizedScale, normalizedScale);
-//    ofScale(scale.x * scaling->x,scale.y * scaling->y,scale.z * scaling->z);
     ofScale(scaling->x,scaling->y,scaling->z);
+
     
-    //EASING//
-//    float targetX = amp;
-//    float dx = targetX - x;
-//    x += dx * easing;
+    if (bMeshModeToggle) {
+        if(bMeshTypeToggle) {
+            mesh.setMode(OF_PRIMITIVE_POINTS);
+        }else{
+            mesh.setMode(OF_PRIMITIVE_LINE_LOOP);
+        }
+    }
+    
 
-    //NOISE//
-    float liquidness = liquid;
-    float amplitude = amp / ampTotal;
-    float speedDampen = dampen;
     vector<ofVec3f>& verts = mesh.getVertices();
-
-    for(unsigned int i = 0; i < verts.size(); i++){
-
+    setVerts(verts, mesh);
+        if(bShowSecondaryMesh){
+            vector<ofVec3f>& vertsSecondary = meshSecondary.getVertices();
+            setVerts(vertsSecondary, meshSecondary);
+        }
+    for(int i = 0; i < verts.size(); i++){
         ofFloatColor c = color;
         c.a = i * alpha;
         mesh.addColor(c);
-
-
-        verts[i].x += ofSignedNoise(verts[i].x/liquidness, verts[i].y/liquidness,verts[i].z/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
-        verts[i].y += ofSignedNoise(verts[i].z/liquidness, verts[i].x/liquidness,verts[i].y/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
-        verts[i].z += ofSignedNoise(verts[i].y/liquidness, verts[i].z/liquidness,verts[i].x/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
-
+        
+        if(bShowSecondaryMesh){
+            ofFloatColor c2 = colorSecondary;
+            c2.a = i * alpha;
+            meshSecondary.addColor(c2);
+        }
     }
+
 
     ofEnableDepthTest();
 
     tex.bind();
     material.begin();
-    ofScale(1.0f,1.0f);
+    float s = 1.0;
+    ofScale(s,s);
     mesh.drawFaces();
     material.end();
     tex.unbind();
+    
+    if(bShowSecondaryMesh) {
+        ofPushStyle();
+            ofPushMatrix();
+                ofVec3f offsetSize = ofVec3f( 2.2f, 2.4f, 2.3f );
+                ofScale(scaling->x * offsetSize.x,scaling->y * offsetSize.y, scaling->z * offsetSize.z);
+                meshSecondary.setMode(OF_PRIMITIVE_POINTS);
+                meshSecondary.drawWireframe();
+            ofPopMatrix();
+        ofPopStyle();
+    }
 
     ofDisableDepthTest();
 
 
-
+    
 }
 
 //--------------------------------------------------------------
@@ -146,11 +195,14 @@ void ofApp::keyPressed(int key){
         bLighting = !bLighting;
         if(bLighting) {
             light.enable();
+            light.setSpotlightCutOff(100.0f);
         } else {
             light.disable();
+            
         }
     }
 }
+
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
@@ -197,29 +249,3 @@ void ofApp::gotMessage(ofMessage msg){
     
 }
 
-//--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){
-
-    
-    int total = dragInfo.files.size();
-    for (int i = 0; i < total; i++) {
-        string filePath = dragInfo.files.at(0);
-        bool bModelLoaded = ofIsStringInString(filePath, "models");
-        bool bTextureLoaded = ofIsStringInString(filePath,"textures");
-
-        if (bModelLoaded) {
-            draggedModel.loadModel(filePath);
-            draggedModel.setPosition(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 0.0f);
-            //light.setPosition(draggedModel.getPosition() + ofPoint(0, 0, 1600));
-            bDrawModel = true;
-        } else if (bTextureLoaded) {
-            img.load(filePath);
-            tex = img.getTexture();
-        }
-        std::cout << "Total Files: " << total << std::endl;
-        std::cout << "File Path: " << filePath << std::endl;
-
-
-    }
-    
-}
