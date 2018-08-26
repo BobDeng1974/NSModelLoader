@@ -39,7 +39,7 @@ public:
     ofxFloatSlider speed, amp, ampTotal, liquid, dampen, alpha;
     ofxVec3Slider rotation, scaling;
     ofxFloatColorSlider color, colorSecondary;
-    ofxToggle bMeshModeToggle, bMeshTypeToggle, bShowSecondaryMesh;
+    ofxToggle bMeshModeToggle, bMeshTypeToggle, bShowSecondaryMesh, bRotateLock;
     
     
 };

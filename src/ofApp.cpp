@@ -24,7 +24,8 @@ void ofApp::setup(){
     gui.add(dampen.setup("Dampening", 0.5f, 0.0f, 5.0f));
     gui.add(alpha.setup("Alpha", 0.1f, 0.0f, 0.007f));
     
-    gui.add(speed.setup("Rotate Speed", 0.5f, 0.0f, 10.0f));
+    gui.add(bRotateLock.setup("Rotate Type", false));
+    gui.add(speed.setup("Rotate Speed", 0.5f, 0.0f, 15.0f));
     gui.add(rotation.setup("Rotation", ofVec3f(0.5f, 0.5f, 0.5f),ofVec3f(0.0f,0.0f,0.0f), ofVec3f(5.0f,5.0f,5.0f)));
     gui.add(scaling.setup("Scaling",ofVec3f(0.5f, 0.5f, 0.5f),ofVec3f(0.0f,0.0f,0.0f), ofVec3f(5.0f,5.0f,5.0f)));
     gui.add(color.setup("Color", ofColor(255,255,255), ofColor(0, 0), ofColor(255, 255)));
@@ -111,13 +112,24 @@ void ofApp::drawModel(){
     ofTranslate(position);
     
     float t = ofGetElapsedTimef() * speed;
-    float timeX = t * rotation->x;
-    float timeY = t * rotation->y;
-    float timeZ = t * rotation->z;
+    float rx;
+    float ry;
+    float rz;
+    
+    if (bRotateLock){
+        rx = ofRadToDeg(rotation->x);
+        ry = ofRadToDeg(rotation->y);
+        rz = ofRadToDeg(rotation->z);
 
-    ofRotateX(timeX);
-    ofRotateY(timeY);
-    ofRotateZ(timeZ);
+    } else {
+        rx = t * rotation->x;
+        ry = t * rotation->y;
+        rz = t * rotation->z;
+
+    }
+    ofRotateX(rx);
+    ofRotateY(ry);
+    ofRotateZ(rz);
     ofScale(normalizedScale, normalizedScale, normalizedScale);
     ofScale(scaling->x,scaling->y,scaling->z);
 
@@ -163,8 +175,8 @@ void ofApp::drawModel(){
     if(bShowSecondaryMesh) {
         ofPushStyle();
             ofPushMatrix();
-                ofVec3f offsetSize = ofVec3f( 2.2f, 2.4f, 2.3f );
-                ofScale(scaling->x * offsetSize.x,scaling->y * offsetSize.y, scaling->z * offsetSize.z);
+               // ofVec3f offsetSize = ofVec3f( 2.2f, 2.4f, 2.3f );
+               // ofScale(scaling->x * offsetSize.x,scaling->y * offsetSize.y, scaling->z * offsetSize.z);
                 meshSecondary.setMode(OF_PRIMITIVE_POINTS);
                 meshSecondary.drawWireframe();
             ofPopMatrix();
