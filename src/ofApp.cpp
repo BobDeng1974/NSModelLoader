@@ -124,7 +124,7 @@ void ofApp::interpolateVerts(vector<ofVec3f>& currentMesh, vector<ofVec3f>& prev
         ofVec3f from = currentMesh[i];
         ofVec3f to = previousMesh[i];
         ofVec3f result = ofVec3f(ofLerp(from.x, to.x, transition),ofLerp(from.y, to.y, transition),ofLerp(from.z, to.z, transition));
-        currentMesh[i] += result;
+        currentMesh[i] = result;
         
 //        currentMesh[i].x += currentMesh[i].x * offsetScale + previousMesh[i].x * transition;
     }
@@ -139,6 +139,7 @@ void ofApp::drawModel(){
     
     ofVboMesh mesh = draggedModel.getMesh(0);
     ofVboMesh meshSecondary = draggedModel.getMesh(0);
+    ofVboMesh meshPrevious = draggedPreviousModel.getMesh(0);
     
     ofTexture texture;
     ofxAssimpMeshHelper& meshHelper = draggedModel.getMeshHelper( 0 );
@@ -185,8 +186,8 @@ void ofApp::drawModel(){
             setVerts(vertsSecondary);
         }
     
-    //vector<ofVec3f>& vertsPrevious = meshPrevious.getVertices(); //Mix Mesh Transition
-    //interpolateVerts(verts,vertsPrevious);
+    vector<ofVec3f>& vertsPrevious = meshPrevious.getVertices(); //Mix Mesh Transition
+    interpolateVerts(verts,vertsPrevious);
 
     
     
