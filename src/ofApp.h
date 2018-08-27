@@ -24,19 +24,22 @@ public:
     void gotMessage(ofMessage msg);
     
     void drawModel();
-    void setVerts(vector<ofVec3f>& v, ofVboMesh m);
-    
+    void setVerts(vector<ofVec3f>& v);
+    void interpolateVerts(vector<ofVec3f>& currentMesh, vector<ofVec3f>&previousMesh);
+
     ofLight light;
     ofMaterial material;
     ofTexture tex;
     ofImage img;
-    ofxAssimpModelLoader draggedModel;
+    //ofVideoPlayer vid; 
+    ofxAssimpModelLoader draggedModel, draggedPreviousModel;
+    int dragCounter;
     
     bool bDrawModel, bHideGui, bLighting;
     
     //GUI//
     ofxPanel gui;
-    ofxFloatSlider speed, amp, ampTotal, liquid, dampen, alpha;
+    ofxFloatSlider speed, amp, ampTotal, liquid, dampen, alpha, transition;
     ofxVec3Slider rotation, scaling;
     ofxFloatColorSlider color, colorSecondary;
     ofxToggle bMeshModeToggle, bMeshTypeToggle, bShowSecondaryMesh, bRotateLock;

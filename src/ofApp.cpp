@@ -5,24 +5,26 @@ void ofApp::setup(){
     
     ofSetFrameRate(60);
     ofSetVerticalSync(true);
-    ofBackground(ofColor::black);
+    ofBackground(0,0,0);
     ofDisableArbTex();
     
 
     bDrawModel = false;
     bHideGui = false;
     bLighting = false;
+    
 
     gui.setup();
     gui.add(bMeshModeToggle.setup("Mesh Mode", false));
     gui.add(bMeshTypeToggle.setup("Mesh Type", false));
     gui.add(bShowSecondaryMesh.setup("Mesh Secondary", false));
+    gui.add(transition.setup("Mesh Transition", 0.0, 0.0, 1.0f));
 
     gui.add(amp.setup("Amplitude", 0.5f, -5.0f, 10.0f));
     gui.add(ampTotal.setup("Amplitude Total", 0.5f, -5.0f, 10.0f));
     gui.add(liquid.setup("Liquid", 0.5f, -5.0f, 500.0f));
     gui.add(dampen.setup("Dampening", 0.5f, 0.0f, 5.0f));
-    gui.add(alpha.setup("Alpha", 0.1f, 0.0f, 0.007f));
+    gui.add(alpha.setup("Alpha", 0.0001f, 0.0f, 0.007f));
     
     gui.add(bRotateLock.setup("Rotate Type", false));
     gui.add(speed.setup("Rotate Speed", 0.5f, 0.0f, 15.0f));
@@ -30,14 +32,15 @@ void ofApp::setup(){
     gui.add(scaling.setup("Scaling",ofVec3f(0.5f, 0.5f, 0.5f),ofVec3f(0.0f,0.0f,0.0f), ofVec3f(5.0f,5.0f,5.0f)));
     gui.add(color.setup("Color", ofColor(255,255,255), ofColor(0, 0), ofColor(255, 255)));
     gui.add(colorSecondary.setup("Color Mesh Secondary", ofColor(255,0,0), ofColor(0, 0), ofColor(255, 255)));
-    //colorSecondary.minimize();
+    
+    dragCounter = -1;
 }
 
 
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){
     
-    
+
     int total = dragInfo.files.size();
     for (int i = 0; i < total; i++) {
         string filePath = dragInfo.files.at(0);
@@ -46,16 +49,30 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
         
         if (bModelLoaded) {
             draggedModel.loadModel(filePath);
-            draggedModel.setPosition(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 0.0f);
-            //light.setPosition(draggedModel.getPosition() + ofPoint(0, 0, 1600));
+            ofVec2f modelOffset = ofVec2f(0.5f,0.5f);
+            int w = ofGetWidth();
+            int h = ofGetHeight();
+            draggedModel.setPosition(w * modelOffset.x, h * modelOffset.y, 0.0f);
             bDrawModel = true;
+            
+            dragCounter++;
+            dragCounter%=2;
+            if(dragCounter==0){
+                draggedPreviousModel.setPosition(w * modelOffset.x, h * modelOffset.y, 0.0f);
+                //draggedPreviousModel.loadModel(filePath);
+                draggedPreviousModel = draggedModel;
+    
+            }
         } else if (bTextureLoaded) {
+//            vid.load(filePath);
+//            vid.play();
+//            tex = vid.getTexture();
             img.load(filePath);
             tex = img.getTexture();
+            
         }
-        std::cout << "Total Files: " << total << std::endl;
-        std::cout << "File Path: " << filePath << std::endl;
-        
+        //std::cout << "Total Files: " << total << std::endl;
+        //std::cout << "File Path: " << filePath << std::endl;
         
     }
     
@@ -76,15 +93,15 @@ void ofApp::draw(){
         gui.draw();
         ofDrawBitmapString("FPS: " + ofToString(ofGetFrameRate()), 10,10);
     }
-
+    
     if(bDrawModel) {
         drawModel();
     }
 
-
+    
 }
 
-void ofApp::setVerts(vector<ofVec3f> &v, ofVboMesh m){
+void ofApp::setVerts(vector<ofVec3f> &v){
     
     float l = liquid;
     float amplitude = amp / ampTotal;
@@ -95,17 +112,34 @@ void ofApp::setVerts(vector<ofVec3f> &v, ofVboMesh m){
         v[i].x += ofSignedNoise(v[i].x/l, v[i].y/l,v[i].z/l, ofGetElapsedTimef()/speedDampen)*amplitude;
         v[i].y += ofSignedNoise(v[i].z/l, v[i].x/l,v[i].y/l, ofGetElapsedTimef()/speedDampen)*amplitude;
         v[i].z += ofSignedNoise(v[i].y/l, v[i].z/l,v[i].x/l, ofGetElapsedTimef()/speedDampen)*amplitude;
-        
+    
     }
 }
+
+void ofApp::interpolateVerts(vector<ofVec3f>& currentMesh, vector<ofVec3f>& previousMesh){
+    
+    ///float offsetScale = 1.0;
+    
+    for(unsigned int i = 0; i < currentMesh.size(); i++){
+        ofVec3f from = currentMesh[i];
+        ofVec3f to = previousMesh[i];
+        ofVec3f result = ofVec3f(ofLerp(from.x, to.x, transition),ofLerp(from.y, to.y, transition),ofLerp(from.z, to.z, transition));
+        currentMesh[i] += result;
+        
+//        currentMesh[i].x += currentMesh[i].x * offsetScale + previousMesh[i].x * transition;
+    }
+}
+
 
 void ofApp::drawModel(){
 
     ofVec3f scale = draggedModel.getScale();
     ofVec3f position = draggedModel.getPosition();
     float normalizedScale = draggedModel.getNormalizedScale();
+    
     ofVboMesh mesh = draggedModel.getMesh(0);
     ofVboMesh meshSecondary = draggedModel.getMesh(0);
+    
     ofTexture texture;
     ofxAssimpMeshHelper& meshHelper = draggedModel.getMeshHelper( 0 );
 
@@ -143,12 +177,19 @@ void ofApp::drawModel(){
     }
     
 
-    vector<ofVec3f>& verts = mesh.getVertices();
-    setVerts(verts, mesh);
+    vector<ofVec3f>& verts = mesh.getVertices(); //Main Mesh Displace
+    setVerts(verts);
+    
         if(bShowSecondaryMesh){
-            vector<ofVec3f>& vertsSecondary = meshSecondary.getVertices();
-            setVerts(vertsSecondary, meshSecondary);
+            vector<ofVec3f>& vertsSecondary = meshSecondary.getVertices(); //Secondary Mesh Displace
+            setVerts(vertsSecondary);
         }
+    
+    //vector<ofVec3f>& vertsPrevious = meshPrevious.getVertices(); //Mix Mesh Transition
+    //interpolateVerts(verts,vertsPrevious);
+
+    
+    
     for(int i = 0; i < verts.size(); i++){
         ofFloatColor c = color;
         c.a = i * alpha;
@@ -182,6 +223,8 @@ void ofApp::drawModel(){
             ofPopMatrix();
         ofPopStyle();
     }
+    
+    
 
     ofDisableDepthTest();
 
