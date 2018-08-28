@@ -179,14 +179,16 @@ void ofApp::drawModel(){
     
 
     vector<ofVec3f>& verts = mesh.getVertices(); //Main Mesh Displace
+    vector<ofVec3f>& vertsPrevious = meshPrevious.getVertices(); //Mix Mesh Transition
+
     setVerts(verts);
     
         if(bShowSecondaryMesh){
             vector<ofVec3f>& vertsSecondary = meshSecondary.getVertices(); //Secondary Mesh Displace
             setVerts(vertsSecondary);
+            interpolateVerts(vertsSecondary, vertsPrevious);
         }
     
-    vector<ofVec3f>& vertsPrevious = meshPrevious.getVertices(); //Mix Mesh Transition
     interpolateVerts(verts,vertsPrevious);
 
     
