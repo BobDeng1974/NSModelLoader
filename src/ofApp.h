@@ -28,6 +28,7 @@ public:
     void interpolateVerts(vector<ofVec3f>& currentMesh, vector<ofVec3f>&previousMesh);
 
     ofLight light;
+    ofShader shader;
     ofMaterial material;
     ofTexture tex;
     ofImage img;
@@ -39,10 +40,11 @@ public:
     
     //GUI//
     ofxPanel gui;
-    ofxFloatSlider speed, amp, ampTotal, liquid, dampen, alpha, transition;
+    
+    ofxFloatSlider speed, amp, ampTotal, liquid, dampen, alpha, transition, ampGPU;
     ofxVec3Slider rotation, scaling;
     ofxFloatColorSlider color, colorSecondary;
-    ofxToggle bMeshModeToggle, bMeshTypeToggle, bShowSecondaryMesh, bRotateLock;
+    ofxToggle bMeshModeToggle, bMeshTypeToggle, bShowSecondaryMesh, bRotateLock, bShader;
     
     
 };

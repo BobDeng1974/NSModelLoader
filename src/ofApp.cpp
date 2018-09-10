@@ -3,6 +3,17 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     
+    
+    #ifdef TARGET_OPENGLES
+        shader.load("shadersES2/shader");
+    #else
+        if(ofIsGLProgrammableRenderer()){
+            shader.load("shaders/shader"); //GL3
+        }else{
+            shader.load("shaders/shader"); //GL2
+        }
+    #endif
+    
     ofSetFrameRate(60);
     ofSetVerticalSync(true);
     ofBackground(0,0,0);
@@ -12,6 +23,7 @@ void ofApp::setup(){
     bDrawModel = false;
     bHideGui = false;
     bLighting = false;
+    bShader = false;
     
 
     gui.setup();
@@ -19,7 +31,10 @@ void ofApp::setup(){
     gui.add(bMeshTypeToggle.setup("Mesh Type", false));
     gui.add(bShowSecondaryMesh.setup("Mesh Secondary", false));
     gui.add(transition.setup("Mesh Transition", 0.0, 0.0, 1.0f));
+    gui.add(bShader.setup("CPU / GPU", true));
+    gui.add(ampGPU.setup("Amplitude GPU", 0.0f, 0.0f, 1000.0f));
 
+    
     gui.add(amp.setup("Amplitude", 0.5f, -5.0f, 10.0f));
     gui.add(ampTotal.setup("Amplitude Total", 0.5f, -5.0f, 10.0f));
     gui.add(liquid.setup("Liquid", 0.5f, -5.0f, 500.0f));
@@ -162,6 +177,7 @@ void ofApp::drawModel(){
         rz = t * rotation->z;
 
     }
+    
     ofRotateX(rx);
     ofRotateY(ry);
     ofRotateZ(rz);
@@ -177,9 +193,11 @@ void ofApp::drawModel(){
         }
     }
     
-
+    
     vector<ofVec3f>& verts = mesh.getVertices(); //Main Mesh Displace
     vector<ofVec3f>& vertsPrevious = meshPrevious.getVertices(); //Mix Mesh Transition
+
+    if (!bShader) { ///SET VERTS CPU
 
     setVerts(verts);
     
@@ -190,6 +208,8 @@ void ofApp::drawModel(){
         }
     
     interpolateVerts(verts,vertsPrevious);
+        
+    }
 
     
     
@@ -204,10 +224,18 @@ void ofApp::drawModel(){
             meshSecondary.addColor(c2);
         }
     }
-
-
+    
     ofEnableDepthTest();
-
+    
+    if (bShader) {
+        ///SET VERTS GPU
+        
+        shader.begin();
+        shader.setUniform1f("time", ofGetElapsedTimef() * 5.0);
+        shader.setUniform1f("amount", ampGPU);
+    }
+    
+    
     tex.bind();
     material.begin();
     float s = 1.0;
@@ -227,8 +255,10 @@ void ofApp::drawModel(){
         ofPopStyle();
     }
     
+    if (bShader) {
+        shader.end();
+    }
     
-
     ofDisableDepthTest();
 
 
