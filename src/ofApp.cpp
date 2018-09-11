@@ -31,7 +31,9 @@ void ofApp::setup(){
     gui.add(bShowSecondaryMesh.setup("Mesh Secondary", false));
     gui.add(transition.setup("Mesh Transition", 0.0, 0.0, 1.0f));
     gui.add(bShader.setup("CPU / GPU", true));
-    gui.add(ampGPU.setup("Amplitude GPU", 0.0f, 0.0f, 1.0f));
+    gui.add(ampGPU.setup("Amplitude GPU", 0.5f, 20.0f, 0.0f));
+    gui.add(speedGPU.setup("Speed GPU", 0.5f, 0.0f, 5.0f));
+    gui.add(heightGPU.setup("Height GPU", 1.0f, 0.0f, 4.0f));
 
     
     gui.add(amp.setup("Amplitude", 0.5f, -5.0f, 10.0f));
@@ -228,8 +230,11 @@ void ofApp::drawModel(){
     if (bShader) {
         
         shader.begin();
-        shader.setUniform1f("time", ofGetElapsedTimef() * 5.0);
+        float t = ofGetElapsedTimef() * speedGPU;
+        shader.setUniform1f("time", t);
         shader.setUniform1f("amount", ampGPU);
+        shader.setUniform1f("height", heightGPU);
+
     }
     
     
@@ -242,7 +247,7 @@ void ofApp::drawModel(){
     tex.unbind();
     
     if(bShowSecondaryMesh) {
-        ofPushStyle();
+        //ofPushStyle();
             ofPushMatrix();
                // ofVec3f offsetSize = ofVec3f( 2.2f, 2.4f, 2.3f );
                // ofScale(scaling->x * offsetSize.x,scaling->y * offsetSize.y, scaling->z * offsetSize.z);
@@ -250,7 +255,7 @@ void ofApp::drawModel(){
                 meshSecondary.drawWireframe();
         
             ofPopMatrix();
-        ofPopStyle();
+        //ofPopStyle();
     }
     
     if(bShader) {

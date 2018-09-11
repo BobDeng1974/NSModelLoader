@@ -41,7 +41,7 @@ public:
     //GUI//
     ofxPanel gui;
     
-    ofxFloatSlider speed, amp, ampTotal, liquid, dampen, alpha, transition, ampGPU;
+    ofxFloatSlider speed, amp, ampTotal, liquid, dampen, alpha, transition, ampGPU, speedGPU, heightGPU;
     ofxVec3Slider rotation, scaling;
     ofxFloatColorSlider color, colorSecondary;
     ofxToggle bMeshModeToggle, bMeshTypeToggle, bShowSecondaryMesh, bRotateLock, bShader;
