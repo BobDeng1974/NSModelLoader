@@ -3,7 +3,6 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     
-    
     #ifdef TARGET_OPENGLES
         shader.load("shadersES2/shader");
     #else
@@ -32,7 +31,7 @@ void ofApp::setup(){
     gui.add(bShowSecondaryMesh.setup("Mesh Secondary", false));
     gui.add(transition.setup("Mesh Transition", 0.0, 0.0, 1.0f));
     gui.add(bShader.setup("CPU / GPU", true));
-    gui.add(ampGPU.setup("Amplitude GPU", 0.0f, 0.0f, 1000.0f));
+    gui.add(ampGPU.setup("Amplitude GPU", 0.0f, 0.0f, 1.0f));
 
     
     gui.add(amp.setup("Amplitude", 0.5f, -5.0f, 10.0f));
@@ -193,7 +192,7 @@ void ofApp::drawModel(){
         }
     }
     
-    
+
     vector<ofVec3f>& verts = mesh.getVertices(); //Main Mesh Displace
     vector<ofVec3f>& vertsPrevious = meshPrevious.getVertices(); //Mix Mesh Transition
 
@@ -210,8 +209,6 @@ void ofApp::drawModel(){
     interpolateVerts(verts,vertsPrevious);
         
     }
-
-    
     
     for(int i = 0; i < verts.size(); i++){
         ofFloatColor c = color;
@@ -222,13 +219,13 @@ void ofApp::drawModel(){
             ofFloatColor c2 = colorSecondary;
             c2.a = i * alpha;
             meshSecondary.addColor(c2);
+            }
         }
-    }
+    
     
     ofEnableDepthTest();
     
     if (bShader) {
-        ///SET VERTS GPU
         
         shader.begin();
         shader.setUniform1f("time", ofGetElapsedTimef() * 5.0);
@@ -251,15 +248,19 @@ void ofApp::drawModel(){
                // ofScale(scaling->x * offsetSize.x,scaling->y * offsetSize.y, scaling->z * offsetSize.z);
                 meshSecondary.setMode(OF_PRIMITIVE_POINTS);
                 meshSecondary.drawWireframe();
+        
             ofPopMatrix();
         ofPopStyle();
     }
     
-    if (bShader) {
+    if(bShader) {
         shader.end();
     }
     
+    
     ofDisableDepthTest();
+    
+  
 
 
     
