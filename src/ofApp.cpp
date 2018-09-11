@@ -36,16 +36,16 @@ void ofApp::setup(){
     gui.add(heightGPU.setup("Height GPU", 1.0f, 0.0f, 4.0f));
 
     
-    gui.add(amp.setup("Amplitude", 0.5f, -5.0f, 10.0f));
-    gui.add(ampTotal.setup("Amplitude Total", 0.5f, -5.0f, 10.0f));
-    gui.add(liquid.setup("Liquid", 0.5f, -5.0f, 500.0f));
-    gui.add(dampen.setup("Dampening", 0.5f, 0.0f, 5.0f));
-    gui.add(alpha.setup("Alpha", 0.0001f, 0.0f, 0.007f));
+    gui.add(amp.setup("Amplitude CPU", 0.5f, -5.0f, 10.0f));
+    gui.add(ampTotal.setup("Amplitude Total CPU", 0.5f, -5.0f, 10.0f));
+    gui.add(liquid.setup("Liquid CPU", 0.5f, -5.0f, 500.0f));
+    gui.add(dampen.setup("Dampening CPU", 0.5f, 0.0f, 5.0f));
     
     gui.add(bRotateLock.setup("Rotate Type", false));
     gui.add(speed.setup("Rotate Speed", 0.5f, 0.0f, 15.0f));
     gui.add(rotation.setup("Rotation", ofVec3f(0.5f, 0.5f, 0.5f),ofVec3f(0.0f,0.0f,0.0f), ofVec3f(5.0f,5.0f,5.0f)));
     gui.add(scaling.setup("Scaling",ofVec3f(0.5f, 0.5f, 0.5f),ofVec3f(0.0f,0.0f,0.0f), ofVec3f(5.0f,5.0f,5.0f)));
+    gui.add(alpha.setup("Alpha", 0.0001f, 0.0f, 0.007f));
     gui.add(color.setup("Color", ofColor(255,255,255), ofColor(0, 0), ofColor(255, 255)));
     gui.add(colorSecondary.setup("Color Mesh Secondary", ofColor(255,0,0), ofColor(0, 0), ofColor(255, 255)));
     
