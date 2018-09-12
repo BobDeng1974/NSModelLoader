@@ -28,11 +28,11 @@ float noise (vec2 st) {
 
 #define OCTAVES 6
 float fbm (vec2 st) {
-    // Initial values
+    
     float value = 0.0;
     float amplitude = .5;
     float frequency = 0.;
-    //
+    
     
     for (int i = 0; i < OCTAVES; i++) {
         value += amplitude * noise(st);
@@ -50,15 +50,14 @@ void main()
     
     vec4 position = ftransform();
     
-    float displacementHeight = height;
-    float displacementY = position.x * sin(cos(time) + (position.z / amount )) * displacementHeight;
+    float displacementY = position.x * sin(cos(time) + (position.z / amount )) * height;
     
     vec4 modifiedPosition = position;
     //modifiedPosition.y += displacementY;
     
     
-    float noiseY = fbm(position.xy / time) * displacementHeight * 100;
-    modifiedPosition.y += noiseY;
+    float noiseY = fbm(time + position.xy / amount) * height * 100;
+    modifiedPosition.x += noiseY;
     
     gl_Position = modifiedPosition;
     
